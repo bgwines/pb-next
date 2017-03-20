@@ -1,7 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module PbAnalyser
+module PbNext.PbAnalyser
 ( getNext
 ) where
 
@@ -17,8 +17,8 @@ import qualified Data.Text.IO (readFile)
 
 import qualified Text.Parsec as Parsec
 
-import Proto
-import ProtoParser
+import PbNext.Proto
+import PbNext.ProtoParser
 
 parse :: FilePath -> EitherT Parsec.ParseError IO Proto
 parse fileName = do

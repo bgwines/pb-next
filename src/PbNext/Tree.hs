@@ -1,6 +1,6 @@
 {-# LANGUAGE InstanceSigs #-}
 
-module Tree
+module PbNext.Tree
     ( Tree(..)
     ) where
 

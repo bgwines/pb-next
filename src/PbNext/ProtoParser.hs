@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module ProtoParser
+module PbNext.ProtoParser
     ( protoParser
     , protoObjParser
     , enumFieldParser
@@ -9,8 +9,8 @@ module ProtoParser
     , fieldQualifierParser
     ) where
 
-import Tree( Tree(..) )
-import Proto
+import PbNext.Tree
+import PbNext.Proto
 
 import Prelude hiding (maybe, Enum)
 

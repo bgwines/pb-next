@@ -1,8 +1,6 @@
 {-# LANGUAGE InstanceSigs #-}
---{-# LANGUAGE DeriveFunctor #-}
---{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Proto
+module PbNext.Proto
     ( Tree(..)
     , Forest(..)
     , Proto(..)
@@ -17,7 +15,7 @@ module Proto
 import Prelude hiding (Enum)
 import qualified Data.Text as T
 
-import Tree
+import PbNext.Tree
 
 type Forest l i = [Tree l i]
 

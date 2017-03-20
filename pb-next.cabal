@@ -1,7 +1,7 @@
 name:                pb-next
 version:             0.1.0.0
--- synopsis:
--- description:
+synopsis:            Utility CLI for working with protobuf files
+description:         `pb-next` is a CLI for generating "next" protocol buffer field values.
 homepage:            https://github.com/githubuser/pb-next#readme
 license:             BSD3
 license-file:        LICENSE
@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     ProtoParser, Proto, PbAnalyser, Tree
+  exposed-modules:     PbNext.ProtoParser, PbNext.Proto, PbNext.PbAnalyser, PbNext.Tree
   build-depends:       base >= 4.7 && < 5
                      , text
                      , parsec

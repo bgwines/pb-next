@@ -14,7 +14,7 @@ import Data.Default (def)
 
 import Data.Text (pack, unpack)
 
-import PbAnalyser
+import PbNext.PbAnalyser
 
 -- | Schema for arguments to exposed commands
 data Command = Next String FilePath deriving (Show)

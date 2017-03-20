@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Tree
-import Proto
-import qualified ProtoParser as PP
+import PbNext.Tree
+import PbNext.Proto
+import qualified PbNext.ProtoParser as PP
 
 import Test.Tasty
 import Test.Tasty.HUnit
