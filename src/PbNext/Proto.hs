@@ -1,13 +1,11 @@
 {-# LANGUAGE InstanceSigs #-}
 
+{-# LANGUAGE DisambiguateRecordFields #-}
+
 module PbNext.Proto
-    ( Tree(..)
-    , Forest(..)
-    , Proto(..)
-    , ProtoObj(..)
-    , Enum(..)
+    ( Proto
+    , PbNode(..)
     , EnumField(..)
-    , Message(..)
     , MessageField(..)
     , FieldQualifier(..)
     ) where
@@ -17,20 +15,23 @@ import qualified Data.Text as T
 
 import PbNext.Tree
 
-type Forest l i = [Tree l i]
+type Proto = Forest PbNode
 
-type Proto = Forest Enum Message
-type ProtoObj = Tree Enum Message
+data PbNode
+    = Enum T.Text [EnumField]
+    | Message T.Text [MessageField]
+    deriving (Show, Eq)
 
-data Enum = Enum T.Text [EnumField] deriving (Show, Eq)
-data EnumField = EnumField T.Text Integer deriving (Show, Eq)
+data EnumField = EnumField
+    { enumFieldName :: T.Text
+    , enumFieldValue :: Integer
+    } deriving (Show, Eq)
 
-data Message = Message T.Text [MessageField] deriving (Show, Eq)
 data MessageField = MessageField
     { fieldQualifier :: FieldQualifier
     , fieldType :: T.Text
-    , name :: T.Text
-    , value :: Integer
+    , messageFieldName :: T.Text
+    , messageFieldValue :: Integer
     } deriving (Show, Eq)
 
 data FieldQualifier = Optional | Required | Repeated deriving (Show, Eq)

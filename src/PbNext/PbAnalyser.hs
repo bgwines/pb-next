@@ -33,24 +33,30 @@ getNext messageName fileName = do
         [] -> fail $ "No proto-objs found with name " ++ unpack messageName
         (message:[]) -> right $ getNext' message
         _ -> fail $ "Multiple proto-objs found with name " ++ unpack messageName
+
+getNext' :: PbNode -> Integer
+getNext' (Message _ fields) = getNext'' fields messageFieldValue
+getNext' (Enum _ fields) = getNext'' fields enumFieldValue
+
+getNext'' fields getValue
+    = maybe (succ . maximum $ fieldNums) fst
+    . find (uncurry (/=))
+    $ zip [1..] fieldNums
     where
-        getNext' :: Message -> Integer
-        getNext' (Message _ fields)
-            = maybe (succ . maximum $ fieldNums) fst
-            . find (uncurry (/=))
-            $ zip [1..] fieldNums
-            where
-                fieldNums :: [Integer]
-                fieldNums = sort . map value $ fields
+        fieldNums :: [Integer]
+        fieldNums = sort . map getValue $ fields
 
-        -- TODO: something fancy like fmap . fmap?
-        mapLeftEitherT :: Monad m => (l -> l') -> EitherT l m r -> EitherT l' m r
-        mapLeftEitherT getMatchingProtoObjs
-            = EitherT
-            . fmap (mapLeft getMatchingProtoObjs)
-            . runEitherT
+-- TODO: something fancy like fmap . fmap?
+mapLeftEitherT :: Monad m => (l -> l') -> EitherT l m r -> EitherT l' m r
+mapLeftEitherT getMatchingProtoObjs
+    = EitherT
+    . fmap (mapLeft getMatchingProtoObjs)
+    . runEitherT
 
-getMatchingProtoObjs :: Text -> Message -> [Message]
+getMatchingProtoObjs :: Text -> PbNode -> [PbNode]
+getMatchingProtoObjs query e@(Enum name _)
+    | name == query = [e]
+    | otherwise = []
 getMatchingProtoObjs query m@(Message name _)
     | name == query = [m]
     | otherwise = []

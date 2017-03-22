@@ -2,14 +2,18 @@
 
 module PbNext.Tree
     ( Tree(..)
+    , Forest
     ) where
 
-data Tree l i
-    = Leaf l
-    | Internal [Tree l i] i
+data Tree node
+    = Leaf node
+    | Internal [Tree node] node
     deriving (Show, Eq)
 
-instance Foldable (Tree leaf) where
-    foldMap :: (Monoid m) => (a -> m) -> Tree leaf a -> m
-    foldMap f (Leaf leaf) = mempty
-    foldMap f (Internal children i) = f i `mappend` (mconcat $ map (foldMap f) children)
+type Forest node = [Tree node]
+
+instance Foldable Tree where
+    foldMap :: (Monoid m) => (node -> m) -> Tree node -> m
+    foldMap f (Leaf node) = f node `mappend` mempty
+    foldMap f (Internal children node)
+        = f node `mappend` (mconcat $ map (foldMap f) children)

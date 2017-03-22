@@ -3,7 +3,7 @@
 
 module PbNext.ProtoParser
     ( protoParser
-    , protoObjParser
+    , protoTreeParser
     , enumFieldParser
     , messageFieldParser
     , fieldQualifierParser
@@ -26,29 +26,30 @@ import Text.Parsec.Char
 import Text.Parsec.Text (Parser)
 
 protoParser :: Parser Proto
-protoParser = parseNWithFallback protoObjParser line
+protoParser = parseNWithFallback protoTreeParser line
 
-protoObjParser :: Parser ProtoObj
-protoObjParser = do
+protoTreeParser :: Parser (Tree PbNode)
+protoTreeParser = do
     dataType <- token
     case dataType of
-            "message" -> (uncurry Internal) <$> messageParser
-            "enum" -> Leaf <$> enumParser
+            "message" -> messageParser
+            "enum" -> enumParser
             _ -> fail "Failed to parse message fields"
 
-messageParser :: Parser ([ProtoObj], Message)
+mapSnd :: (b -> c) -> (a, b) -> (a, c)
+mapSnd f (a, b) = (a, f b)
+
+messageParser :: Parser (Tree PbNode)
 messageParser = do
     name <- token
     elems <- brackets (parseNWithFallback messageFieldParser comment)
     let nonRecFields = rights elems
     let recFields = lefts elems
-    return $ (recFields, Message name nonRecFields)
+    return $ Internal recFields (Message name nonRecFields)
 
-enumParser :: Parser Enum
+enumParser :: Parser (Tree PbNode)
 enumParser
-    =   Enum
-    <$> token
-    <*> brackets (parseNWithFallback enumFieldParser comment)
+    = Leaf <$> (Enum <$> token <*> brackets (parseNWithFallback enumFieldParser comment))
 
 enumFieldParser :: Parser EnumField
 enumFieldParser = do
@@ -60,13 +61,13 @@ enumFieldParser = do
     line
     return $ EnumField fieldName value
 
-messageFieldParser :: Parser (Either ProtoObj MessageField)
+messageFieldParser :: Parser (Either (Tree PbNode) MessageField)
 messageFieldParser = do
     maybe deprecated
     fieldQualifierOrProtoObjDecl <- token
     case fieldQualifierOrProtoObjDecl of
-        "message" -> (Left . uncurry Internal) <$> messageParser
-        "enum" -> (Left . Leaf) <$> enumParser
+        "message" -> Left <$> messageParser
+        "enum" -> Left <$> enumParser
         fieldQualifier -> Right <$> (nonRecMessageFieldParser' $ textToFieldQualifier fieldQualifier)
     where
         nonRecMessageFieldParser' :: FieldQualifier -> Parser MessageField

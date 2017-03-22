@@ -55,91 +55,91 @@ testProtoObjParsing1 :: Assertion
 testProtoObjParsing1 = do
     let proto = "message A {\noptional string B = 1;\n}\n"
     let expected = Right $ Internal [] $ Message "A" [MessageField Optional "string" "B" 1]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing2 :: Assertion
 testProtoObjParsing2 = do
     let proto = "enum A {\nB = 1;\n\n}\n"
     let expected = Right $ Leaf $ Enum "A" [EnumField "B" 1]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing3 :: Assertion
 testProtoObjParsing3 = do
     let proto = "message A {\noptional string B = 1;\nrequired string C = 2;\n}\n"
     let expected = Right $ Internal [] $ Message "A" [MessageField Optional "string" "B" 1, MessageField Required "string" "C" 2]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing4 :: Assertion
 testProtoObjParsing4 = do
     let proto = "enum A {\nB = 1;\nC = 2;\n}\n"
     let expected = Right $ Leaf $ Enum "A" [EnumField "B" 1, EnumField "C" 2]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing5 :: Assertion
 testProtoObjParsing5 = do
     let proto = "message A {\nmessage B {\noptional string C = 1;\n}\n}\n"
     let expected = Right $ Internal [Internal [] $ Message "B" [MessageField Optional "string" "C" 1]] $ Message "A" []
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing6 :: Assertion
 testProtoObjParsing6 = do
     let proto = "message A {\nenum B {\nC = 1;\n}\n}\n"
     let expected = Right $ Internal [Leaf $ Enum "B" [EnumField "C" 1]] $ Message "A" []
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing7 :: Assertion
 testProtoObjParsing7 = do
     let proto = "message BrokerJobStatus {\nenum State {\nBROKER_INCOMING = 0;\nWORKER_SLOT = 1;\nWORKER_PROCESSING = 2;\nBROKER_OUTGOING = 3;\nWORKER_DIRECT = 4;\nWORKER_PARALLEL = 5;\n}\noptional State state = 1;\noptional int usec = 2;\noptional int broker_index = 3;\noptional string worker_id = 4;\noptional int32 slot = 5;\noptional string likely_worker_id = 6;\n}\n"
     let expected = Right $ Internal [Leaf $ Enum "State" [ EnumField "BROKER_INCOMING" 0 , EnumField "WORKER_SLOT" 1 , EnumField "WORKER_PROCESSING" 2 , EnumField "BROKER_OUTGOING" 3 , EnumField "WORKER_DIRECT" 4 , EnumField "WORKER_PARALLEL" 5 ]] $ Message "BrokerJobStatus" [MessageField Optional "State" "state" 1 , MessageField Optional "int" "usec" 2 , MessageField Optional "int" "broker_index" 3 , MessageField Optional "string" "worker_id" 4 , MessageField Optional "int32" "slot" 5 , MessageField Optional "string" "likely_worker_id" 6 ]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing8 :: Assertion
 testProtoObjParsing8 = do
     let proto = "enum A {\nB = 1; // x\nC = 2;\n}\n"
     let expected = Right $ Leaf $ Enum "A" [EnumField "B" 1, EnumField "C" 2]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing10 :: Assertion
 testProtoObjParsing10 = do
     let proto = "message WorkerLoop {\n  optional string name = 1;\n}"
     let expected = Right $ Internal [] $ Message "WorkerLoop" [MessageField Optional "string" "name" 1]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing11 :: Assertion
 testProtoObjParsing11 = do
     let proto = "message DependentRule {\n    optional string name = 1;\n    }"
     let expected = Right $ Internal [] $ Message "DependentRule" [MessageField Optional "string" "name" 1]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing12 :: Assertion
 testProtoObjParsing12 = do
     let proto = "message WorkerLoop {\n  message DependentRule {\n    optional string name = 1;\n  }\n}"
     let expected = Right $ Internal [Internal [] $ Message "DependentRule" [MessageField Optional "string" "name" 1]] $ Message "WorkerLoop" []
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing13 :: Assertion
 testProtoObjParsing13 = do
     let proto = "message WorkerLoop {\n  // DEPRECATED optional string name = 1;\n}"
     let expected = Right $ Internal [] $ Message "WorkerLoop" [MessageField Optional "string" "name" 1]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoObjParsing14 :: Assertion
 testProtoObjParsing14 = do
     let proto = "message WorkerLoop {\n  // DEPRECATED: optional string name = 1;\n}"
     let expected = Right $ Internal [] $ Message "WorkerLoop" [MessageField Optional "string" "name" 1]
-    let actual = Parsec.parse PP.protoObjParser "" proto
+    let actual = Parsec.parse PP.protoTreeParser "" proto
     actual @?= expected
 
 testProtoParsing1 :: Assertion
