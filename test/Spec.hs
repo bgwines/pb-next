@@ -2,7 +2,10 @@
 
 import PbNext.Tree
 import PbNext.Proto
+import qualified PbNext.Analyzer as A
 import qualified PbNext.ProtoParser as PP
+
+import Control.Monad.Trans.Either
 
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -179,7 +182,57 @@ testProtoParsing4 = do
 
 testGetNext1 :: Assertion
 testGetNext1 = do
-    1 @?= 1
+    let proto = [Leaf $ Enum "A" [EnumField "B" 1]]
+    (Right result) <- runEitherT $ A.getNext "A" proto
+    2 @?= result
+
+testGetNext2 :: Assertion
+testGetNext2 = do
+    let proto = [Internal [Leaf $ Enum "A" [EnumField "D" 1, EnumField "B" 2]] $ Message "C" []]
+    (Right result) <- runEitherT $ A.getNext "A" proto
+    3 @?= result
+
+testGetNext3 :: Assertion
+testGetNext3 = do
+    let proto = [Internal [Internal [Internal [Leaf $ Enum "A" [EnumField "D" 1, EnumField "B" 2]] $ Message "Y" []] $ Message "X" []] $ Message "C" []]
+    (Right result) <- runEitherT $ A.getNext "A" proto
+    3 @?= result
+
+testGetNext4 :: Assertion
+testGetNext4 = do
+    let proto = [Internal [Internal [Internal [Leaf $ Enum "A" [EnumField "D" 1, EnumField "B" 2]] $ Message "Y" []] $ Message "X" []] $ Message "C" []]
+    (Right result) <- runEitherT $ A.getNext "A" proto
+    3 @?= result
+
+testGetNext5 :: Assertion
+testGetNext5 = do
+    let proto = [Internal [Internal [Internal [Leaf $ Enum "A" [EnumField "D" 1, EnumField "B" 2]] $ Message "Y" [MessageField Optional "string" "Z" 1]] $ Message "X" []] $ Message "C" []]
+    (Right result) <- runEitherT $ A.getNext "Y" proto
+    2 @?= result
+
+testGetNext6 :: Assertion
+testGetNext6 = do
+    let proto = [Internal [] $ Message "A" []]
+    (Right result) <- runEitherT $ A.getNext "A" proto
+    1 @?= result
+
+testGetNext7 :: Assertion
+testGetNext7 = do
+    let proto = [Leaf $ Enum "A" []]
+    (Right result) <- runEitherT $ A.getNext "A" proto
+    1 @?= result
+
+testGetNext8 :: Assertion
+testGetNext8 = do
+    let proto = [Internal [Leaf $ Enum "A" [EnumField "D" 1, EnumField "B" 4]] $ Message "C" []]
+    (Right result) <- runEitherT $ A.getNext "A" proto
+    2 @?= result
+
+testGetNext9 :: Assertion
+testGetNext9 = do
+    let proto = [Leaf $ Enum "A" [EnumField "D" 0, EnumField "B" 1]]
+    (Right result) <- runEitherT $ A.getNext "A" proto
+    2 @?= result
 
 testParser :: TestTree
 testParser = testGroup "Parser tests"
@@ -211,8 +264,16 @@ testParser = testGroup "Parser tests"
     ]
 
 testAnalyzer :: TestTree
-testAnalyzer = testGroup "Analyser tests"
+testAnalyzer = testGroup "Analyzer tests"
     [ testCase "getNext 1" testGetNext1
+    , testCase "getNext 2" testGetNext2
+    , testCase "getNext 3" testGetNext3
+    , testCase "getNext 4" testGetNext4
+    , testCase "getNext 5" testGetNext5
+    , testCase "getNext 6" testGetNext6
+    , testCase "getNext 7" testGetNext7
+    , testCase "getNext 8" testGetNext8
+    , testCase "getNext 9" testGetNext9
     ]
 
 main :: IO ()
