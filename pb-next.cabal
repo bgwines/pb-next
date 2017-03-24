@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     PbNext.ProtoParser, PbNext.Proto, PbNext.PbAnalyser, PbNext.Tree
+  exposed-modules:     PbNext.ProtoParser, PbNext.Proto, PbNext.Analyzer, PbNext.Tree
   build-depends:       base >= 4.7 && < 5
                      , text
                      , parsec
@@ -33,6 +33,8 @@ executable pbhelp
                      , text
                      , optparse-applicative
                      , data-default
+                     , transformers
+                     , parsec
   default-language:    Haskell2010
 
 test-suite pb-next-test

@@ -177,6 +177,10 @@ testProtoParsing4 = do
     let actual = Parsec.parse PP.protoParser "" proto
     actual @?= expected
 
+testGetNext1 :: Assertion
+testGetNext1 = do
+    1 @?= 1
+
 testParser :: TestTree
 testParser = testGroup "Parser tests"
     [ testCase "MessageField parsing 1" testMessageFieldParsing1
@@ -206,5 +210,10 @@ testParser = testGroup "Parser tests"
     , testCase "Proto parsing 4" testProtoParsing4
     ]
 
+testAnalyzer :: TestTree
+testAnalyzer = testGroup "Analyser tests"
+    [ testCase "getNext 1" testGetNext1
+    ]
+
 main :: IO ()
-main = defaultMain $ testGroup "All tests" [testParser]
+main = defaultMain $ testGroup "All tests" [testParser, testAnalyzer]
