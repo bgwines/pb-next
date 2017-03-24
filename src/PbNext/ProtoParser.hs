@@ -54,12 +54,22 @@ enumParser
 enumFieldParser :: Parser EnumField
 enumFieldParser = do
     maybe deprecated
-    fieldName <- token
-    char '='
-    whitespace
-    value <- positiveNatural
-    line
-    return $ EnumField fieldName value
+    firstToken <- token
+    if isFieldQualifier firstToken
+        then do
+            fieldType <- token
+            fieldName <- token
+            char '='
+            whitespace
+            value <- positiveNatural
+            line
+            return $ EnumField fieldName value
+        else do
+            char '='
+            whitespace
+            value <- positiveNatural
+            line
+            return $ EnumField firstToken value
 
 messageFieldParser :: Parser (Either (Tree PbNode) MessageField)
 messageFieldParser = do
@@ -82,6 +92,12 @@ messageFieldParser = do
 
 fieldQualifierParser :: Parser FieldQualifier
 fieldQualifierParser = textToFieldQualifier <$> token
+
+isFieldQualifier :: Text -> Bool
+isFieldQualifier "optional" = True
+isFieldQualifier "required" = True
+isFieldQualifier "repeated" = True
+isFieldQualifier _ = False
 
 textToFieldQualifier :: Text -> FieldQualifier
 textToFieldQualifier "optional" = Optional

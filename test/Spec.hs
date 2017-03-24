@@ -51,6 +51,13 @@ testEnumFieldParsing2 = do
     let actual = Parsec.parse PP.enumFieldParser "" proto
     actual @?= expected
 
+testEnumFieldParsing3 :: Assertion
+testEnumFieldParsing3 = do
+    let proto = "optional string B = 10;\n"
+    let expected = Right $ EnumField "B" 10
+    let actual = Parsec.parse PP.enumFieldParser "" proto
+    actual @?= expected
+
 testProtoObjParsing1 :: Assertion
 testProtoObjParsing1 = do
     let proto = "message A {\noptional string B = 1;\n}\n"
@@ -178,6 +185,7 @@ testParser = testGroup "Parser tests"
     , testCase "MessageField parsing 4" testMessageFieldParsing4
     , testCase "EnumField parsing 1" testEnumFieldParsing1
     , testCase "EnumField parsing 2" testEnumFieldParsing2
+    , testCase "EnumField parsing 3" testEnumFieldParsing3
     , testCase "ProtoObj parsing 1" testProtoObjParsing1
     , testCase "ProtoObj parsing 2" testProtoObjParsing2
     , testCase "ProtoObj parsing 3" testProtoObjParsing3

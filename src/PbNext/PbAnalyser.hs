@@ -53,6 +53,11 @@ mapLeftEitherT getMatchingProtoObjs
     . fmap (mapLeft getMatchingProtoObjs)
     . runEitherT
 
+-- for debugging
+getName :: PbNode -> [Text]
+getName e@(Enum name _) = [name]
+getName m@(Message name _) = [name]
+
 getMatchingProtoObjs :: Text -> PbNode -> [PbNode]
 getMatchingProtoObjs query e@(Enum name _)
     | name == query = [e]
