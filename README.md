@@ -1,5 +1,9 @@
 `pb-next` is a CLI for generating "next" protocol buffer field values.
 
+## Installation
+
+`brew install haskell-stack; stack setup; stack install`
+
 ## Usage
 
 Generate a valid PB field value for the specified message:
